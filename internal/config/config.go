@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/ziliscite/messaging-app/pkg"
+	"github.com/ziliscite/messaging-app/internal/util"
 	"os"
 )
 
@@ -16,11 +16,11 @@ type DatabaseConfig struct {
 
 func newDatabaseConfig() *DatabaseConfig {
 	return &DatabaseConfig{
-		DBHost: pkg.MustEnv(os.Getenv("DB_HOST")),
-		DBPort: pkg.MustEnv(os.Getenv("DB_PORT")),
-		DBUser: pkg.MustEnv(os.Getenv("DB_USER")),
-		DBPass: pkg.MustEnv(os.Getenv("DB_PASSWORD")),
-		DBName: pkg.MustEnv(os.Getenv("DB_NAME")),
+		DBHost: util.MustEnv(os.Getenv("DB_HOST")),
+		DBPort: util.MustEnv(os.Getenv("DB_PORT")),
+		DBUser: util.MustEnv(os.Getenv("DB_USER")),
+		DBPass: util.MustEnv(os.Getenv("DB_PASSWORD")),
+		DBName: util.MustEnv(os.Getenv("DB_NAME")),
 	}
 }
 
@@ -39,15 +39,15 @@ type Config struct {
 }
 
 func New() *Config {
-	pkg.MustServe(godotenv.Load())
+	util.MustServe(godotenv.Load())
 
 	database := newDatabaseConfig()
 
 	return &Config{
 		Database:    database,
-		Port:        pkg.MustEnv(os.Getenv("PORT")),
-		Environment: pkg.MustEnv(os.Getenv("ENVIRONMENT")),
-		Secret:      pkg.MustEnv(os.Getenv("JWT_SECRET")),
+		Port:        util.MustEnv(os.Getenv("PORT")),
+		Environment: util.MustEnv(os.Getenv("ENVIRONMENT")),
+		Secret:      util.MustEnv(os.Getenv("JWT_SECRET")),
 	}
 }
 
@@ -57,4 +57,8 @@ func (c *Config) Address() string {
 	}
 
 	return "localhost" + c.Port
+}
+
+func (c *Config) IsProduction() bool {
+	return c.Environment == "production"
 }

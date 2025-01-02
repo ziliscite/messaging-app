@@ -1,4 +1,4 @@
-package pkg
+package util
 
 import "errors"
 
@@ -11,9 +11,7 @@ func Must[T any](value T, err error) T {
 }
 
 func MustServe(err error) {
-	if err != nil {
-		panic(err)
-	}
+	_ = Must(err, err)
 }
 
 func MustEnv(value string) string {

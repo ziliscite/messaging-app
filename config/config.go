@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/ziliscite/messaging-app/internal/util"
+	"github.com/ziliscite/messaging-app/pkg/must"
 	"os"
 )
 
@@ -16,12 +16,16 @@ type DatabaseConfig struct {
 
 func newDatabaseConfig() *DatabaseConfig {
 	return &DatabaseConfig{
-		DBHost: util.MustEnv(os.Getenv("DB_HOST")),
-		DBPort: util.MustEnv(os.Getenv("DB_PORT")),
-		DBUser: util.MustEnv(os.Getenv("DB_USER")),
-		DBPass: util.MustEnv(os.Getenv("DB_PASSWORD")),
-		DBName: util.MustEnv(os.Getenv("DB_NAME")),
+		DBHost: must.MustEnv(os.Getenv("DB_HOST")),
+		DBPort: must.MustEnv(os.Getenv("DB_PORT")),
+		DBUser: must.MustEnv(os.Getenv("DB_USER")),
+		DBPass: must.MustEnv(os.Getenv("DB_PASSWORD")),
+		DBName: must.MustEnv(os.Getenv("DB_NAME")),
 	}
+}
+
+func (c *DatabaseConfig) ConnectionString() string {
+	return "host=" + c.DBHost + " port=" + c.DBPort + " user=" + c.DBUser + " password=" + c.DBPass + " dbname=" + c.DBName + " sslmode=disable"
 }
 
 type Config struct {
@@ -39,15 +43,15 @@ type Config struct {
 }
 
 func New() *Config {
-	util.MustServe(godotenv.Load())
+	must.MustServe(godotenv.Load())
 
 	database := newDatabaseConfig()
 
 	return &Config{
 		Database:    database,
-		Port:        util.MustEnv(os.Getenv("PORT")),
-		Environment: util.MustEnv(os.Getenv("ENVIRONMENT")),
-		Secret:      util.MustEnv(os.Getenv("JWT_SECRET")),
+		Port:        must.MustEnv(os.Getenv("PORT")),
+		Environment: must.MustEnv(os.Getenv("ENVIRONMENT")),
+		Secret:      must.MustEnv(os.Getenv("JWT_SECRET")),
 	}
 }
 

@@ -1,0 +1,36 @@
+package rest
+
+import (
+	"encoding/json"
+	"github.com/ziliscite/messaging-app/internal/core/service/user"
+	"net/http"
+)
+
+type UserHandler struct {
+	s user.API
+}
+
+func New(service user.API) *UserHandler {
+	return &UserHandler{
+		s: service,
+	}
+}
+
+func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var request user.RegisterRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	response, err := h.s.Register(r.Context(), &request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(response)
+	w.WriteHeader(http.StatusOK)
+}

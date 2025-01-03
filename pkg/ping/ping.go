@@ -2,34 +2,42 @@ package ping
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 )
 
-func Ping(w http.ResponseWriter, r *http.Request) {
+func ping(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	type PingRequest struct {
 		Message string `json:"message"`
 	}
 
-	var ping PingRequest
-	if err := json.NewDecoder(r.Body).Decode(&ping); err != nil {
+	var request PingRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	if len(ping.Message) > 200 {
+	if len(request.Message) > 200 {
 		http.Error(w, "message too long", http.StatusBadRequest)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(map[string]any{"response": "Pong: " + ping.Message})
+	_ = json.NewEncoder(w).Encode(map[string]any{"response": "Pong: " + request.Message})
 }
 
-func Health(w http.ResponseWriter, r *http.Request) {
+func health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(map[string]any{"message": "OK"})
+}
+
+func Register(mux *chi.Mux) {
+	mux.Group(func(r chi.Router) {
+		mux.Get("/health", health)
+		mux.Post("/ping", ping)
+	})
 }

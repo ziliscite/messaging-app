@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ziliscite/messaging-app/config"
+	userRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/user"
+	userHandler "github.com/ziliscite/messaging-app/internal/adapter/rest/user"
+	userService "github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/db/posgres"
 	"github.com/ziliscite/messaging-app/pkg/must"
 	"github.com/ziliscite/messaging-app/pkg/ping"
@@ -20,19 +24,24 @@ func main() {
 	mux := chi.NewRouter()
 	mux.Use(middleware.Logger, middleware.Recoverer, middleware.URLFormat, middleware.CleanPath)
 
-	must.MustServe(run(configs, mux))
-}
+	UserMux(mux, conn)
 
-func run(configs *config.Config, mux *chi.Mux) error {
-	mux.Get("/health", ping.Health)
-	mux.Post("/ping", ping.Ping)
+	ping.Register(mux)
 
-	if err := chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+	fmt.Printf("Running on %s\n", configs.Address())
+	fmt.Printf("Routes:\n")
+	must.MustServe(chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		fmt.Printf("  %-7s %s\n", method, route)
 		return nil
-	}); err != nil {
-		return err
-	}
+	}))
 
-	return http.ListenAndServe(configs.Address(), mux)
+	must.MustServe(http.ListenAndServe(configs.Address(), mux))
+}
+
+func UserMux(mux *chi.Mux, conn *pgxpool.Pool) {
+	repository := userRepository.New(conn)
+	service := userService.New(repository)
+	handler := userHandler.New(service)
+
+	handler.Routes(mux)
 }

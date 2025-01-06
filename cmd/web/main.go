@@ -14,6 +14,7 @@ import (
 	"github.com/ziliscite/messaging-app/pkg/db/posgres"
 	"github.com/ziliscite/messaging-app/pkg/must"
 	"github.com/ziliscite/messaging-app/pkg/ping"
+	_ "github.com/ziliscite/messaging-app/pkg/token"
 	"net/http"
 )
 

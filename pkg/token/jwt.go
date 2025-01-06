@@ -2,7 +2,11 @@ package token
 
 import (
 	"errors"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/ziliscite/messaging-app/pkg/must"
+	"os"
+	"strconv"
 	"time"
 )
 
@@ -11,20 +15,30 @@ var ErrFailedSigning = errors.New("failed creating token")
 var ErrParsingToken = errors.New("failed parsing token")
 var ErrExpiredToken = errors.New("token expired")
 
+type CustomClaims struct {
+	jwt.RegisteredClaims
+	Email string `json:"email"`
+}
+
 // Create token
 //
 // Returns token string, expiration, and error
 func Create(id uint, exp int64, email, secretKey string) (string, time.Time, error) {
-	expAt := time.Now().Add(time.Duration(exp) * time.Minute)
+	now := time.Now()
+	expAt := now.Add(time.Duration(exp) * time.Minute)
 
-	t := jwt.NewWithClaims(
-		jwt.SigningMethodHS256,
-		jwt.MapClaims{
-			"id":    id,
-			"email": email,
-			"exp":   expAt,
+	claims := CustomClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expAt),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			Issuer:    must.MustEnv(os.Getenv("APP_NAME")),
+			Subject:   fmt.Sprintf("%d", id),
 		},
-	)
+		Email: email,
+	}
+
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenStr, err := t.SignedString([]byte(secretKey))
 	if err != nil {
@@ -38,12 +52,10 @@ func Create(id uint, exp int64, email, secretKey string) (string, time.Time, err
 //
 // Returns user id and username
 func Validate(tokenStr, secretKey string) (uint, string, error) {
-	key := []byte(secretKey)
-	claims := jwt.MapClaims{}
-
-	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return key, nil
+	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
 	})
+
 	if err != nil {
 		return 0, "", ErrParsingToken
 	}
@@ -52,14 +64,26 @@ func Validate(tokenStr, secretKey string) (uint, string, error) {
 		return 0, "", ErrInvalidToken
 	}
 
-	expClaim, ok := claims["exp"].(float64)
+	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
 		return 0, "", ErrInvalidToken
 	}
 
-	if int64(expClaim) < time.Now().Unix() {
+	// Check if the token has expired
+	if claims.ExpiresAt.Before(time.Now()) {
 		return 0, "", ErrExpiredToken
 	}
 
-	return uint(claims["id"].(float64)), claims["username"].(string), nil
+	// Validate the issuer
+	if claims.Issuer != must.MustEnv(os.Getenv("APP_NAME")) {
+		return 0, "", ErrInvalidToken
+	}
+
+	// Parse the subject (user ID) from the token
+	id, err := strconv.ParseUint(claims.Subject, 10, 32)
+	if err != nil {
+		return 0, "", ErrInvalidToken
+	}
+
+	return uint(id), claims.Email, nil
 }

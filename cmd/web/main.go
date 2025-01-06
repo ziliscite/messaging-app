@@ -6,8 +6,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ziliscite/messaging-app/config"
+	sessionRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/session"
 	userRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/user"
 	userHandler "github.com/ziliscite/messaging-app/internal/adapter/rest/user"
+	authService "github.com/ziliscite/messaging-app/internal/core/service/auth"
 	userService "github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/db/posgres"
 	"github.com/ziliscite/messaging-app/pkg/must"
@@ -18,13 +20,13 @@ import (
 func main() {
 	configs := config.New()
 
-	conn := posgres.New(configs)
+	conn := posgres.New(configs.Database)
 	defer conn.Close()
 
 	mux := chi.NewRouter()
 	mux.Use(middleware.Logger, middleware.Recoverer, middleware.URLFormat, middleware.CleanPath)
 
-	UserMux(mux, conn)
+	UserMux(mux, configs.Token, conn)
 
 	ping.Register(mux)
 
@@ -38,10 +40,13 @@ func main() {
 	must.MustServe(http.ListenAndServe(configs.Address(), mux))
 }
 
-func UserMux(mux *chi.Mux, conn *pgxpool.Pool) {
-	repository := userRepository.New(conn)
-	service := userService.New(repository)
-	handler := userHandler.New(service)
+func UserMux(mux *chi.Mux, cfg *config.TokenConfig, conn *pgxpool.Pool) {
+	userRepo := userRepository.New(conn)
+	userSvc := userService.New(userRepo)
 
+	sessionRepo := sessionRepository.New(conn)
+	authSvc := authService.New(sessionRepo, cfg)
+
+	handler := userHandler.New(userSvc, authSvc)
 	handler.Routes(mux)
 }

@@ -1,4 +1,4 @@
-package user
+package session
 
 import (
 	"github.com/jackc/pgx/v5/pgxpool"

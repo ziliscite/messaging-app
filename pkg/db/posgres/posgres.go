@@ -7,6 +7,6 @@ import (
 	"github.com/ziliscite/messaging-app/pkg/must"
 )
 
-func New(configs *config.Config) *pgxpool.Pool {
-	return must.Must(pgxpool.New(context.Background(), configs.Database.ConnectionString()))
+func New(configs *config.DatabaseConfig) *pgxpool.Pool {
+	return must.Must(pgxpool.New(context.Background(), configs.ConnectionString()))
 }

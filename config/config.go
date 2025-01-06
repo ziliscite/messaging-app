@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/ziliscite/messaging-app/pkg/must"
 	"os"
+	"strconv"
 )
 
 type DatabaseConfig struct {
@@ -28,6 +29,23 @@ func (c *DatabaseConfig) ConnectionString() string {
 	return "host=" + c.DBHost + " port=" + c.DBPort + " user=" + c.DBUser + " password=" + c.DBPass + " dbname=" + c.DBName + " sslmode=disable"
 }
 
+type TokenConfig struct {
+	Secret                     string
+	AccessTokenExpirationTime  int64
+	RefreshTokenExpirationTime int64
+}
+
+func newTokenConfig() *TokenConfig {
+	accessExp := must.Must(strconv.Atoi(must.MustEnv(os.Getenv("ACCESS_TOKEN_EXPIRATION_MINUTES"))))
+	refreshExp := must.Must(strconv.Atoi(must.MustEnv(os.Getenv("REFRESH_TOKEN_EXPIRATION_MINUTES"))))
+
+	return &TokenConfig{
+		Secret:                     must.MustEnv(os.Getenv("JWT_SECRET")),
+		AccessTokenExpirationTime:  int64(accessExp),
+		RefreshTokenExpirationTime: int64(refreshExp),
+	}
+}
+
 type Config struct {
 	// Database connection string
 	Database *DatabaseConfig
@@ -38,20 +56,21 @@ type Config struct {
 	// Port server is running on
 	Port string
 
-	// Secret JWT key
-	Secret string
+	// Token config for JWT
+	Token *TokenConfig
 }
 
 func New() *Config {
 	must.MustServe(godotenv.Load())
 
 	database := newDatabaseConfig()
+	token := newTokenConfig()
 
 	return &Config{
 		Database:    database,
 		Port:        must.MustEnv(os.Getenv("PORT")),
 		Environment: must.MustEnv(os.Getenv("ENVIRONMENT")),
-		Secret:      must.MustEnv(os.Getenv("JWT_SECRET")),
+		Token:       token,
 	}
 }
 

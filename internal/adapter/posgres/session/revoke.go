@@ -6,8 +6,8 @@ import (
 	"github.com/ziliscite/messaging-app/internal/adapter/posgres"
 )
 
-func (r *Repository) Revoke(ctx context.Context, accessToken string, userId uint) error {
-	tag, err := r.db.Exec(ctx, `DELETE FROM sessions WHERE access_token = $1 AND user_id = $2`, accessToken, userId)
+func (r *Repository) Revoke(ctx context.Context, userId uint) error {
+	tag, err := r.db.Exec(ctx, `DELETE FROM sessions WHERE user_id = $1`, userId)
 	if err != nil {
 		return fmt.Errorf("%w: %v", posgres.ErrDatabase, err)
 	}

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -27,3 +28,5 @@ func ErrInvalidFormat(field, expectedFormat string) error {
 func ErrOutOfRange(field string, min, max int) error {
 	return fmt.Errorf("%s must be between %d and %d", field, min, max)
 }
+
+var ErrFailedParsingValue = errors.New("failed parsing value")

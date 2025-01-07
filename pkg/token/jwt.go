@@ -50,7 +50,7 @@ func Create(id uint, exp int64, email, secretKey string) (string, time.Time, err
 
 // Validate token
 //
-// Returns user id and username
+// Returns user id and email
 func Validate(tokenStr, secretKey string) (uint, string, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil

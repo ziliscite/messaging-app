@@ -9,16 +9,17 @@ import (
 	"github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/token"
 	"net/http"
+	"time"
 )
 
 type LoginResponse struct {
-	ID                    uint   `json:"id,omitempty"`
-	Username              string `json:"username,omitempty"`
-	Email                 string `json:"email,omitempty"`
-	AccessToken           string `json:"access_token,omitempty"`
-	AccessTokenExpiresAt  int64  `json:"access_token_expires_at,omitempty"`
-	RefreshToken          string `json:"refresh_token,omitempty"`
-	RefreshTokenExpiresAt int64  `json:"refresh_token_expires_at,omitempty"`
+	ID                    uint      `json:"id,omitempty"`
+	Username              string    `json:"username,omitempty"`
+	Email                 string    `json:"email,omitempty"`
+	AccessToken           string    `json:"access_token,omitempty"`
+	AccessTokenExpiresAt  time.Time `json:"access_token_expires_at,omitempty"`
+	RefreshToken          string    `json:"refresh_token,omitempty"`
+	RefreshTokenExpiresAt time.Time `json:"refresh_token_expires_at,omitempty"`
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
@@ -63,9 +64,9 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		Username:              userResponse.Username,
 		Email:                 userResponse.Email,
 		AccessToken:           sessionResponse.AccessToken,
-		AccessTokenExpiresAt:  sessionResponse.AccessTokenExpiresAt.Unix(),
+		AccessTokenExpiresAt:  sessionResponse.AccessTokenExpiresAt,
 		RefreshToken:          sessionResponse.RefreshToken,
-		RefreshTokenExpiresAt: sessionResponse.RefreshTokenExpiresAt.Unix(),
+		RefreshTokenExpiresAt: sessionResponse.RefreshTokenExpiresAt,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

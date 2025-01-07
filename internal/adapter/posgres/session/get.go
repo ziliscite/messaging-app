@@ -9,16 +9,16 @@ import (
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/session"
 )
 
-// GetSession returns a refresh token by access token and user id
-func (r *Repository) GetSession(ctx context.Context, accessToken string, userId uint) (*domain.Session, error) {
+// GetSession returns a refresh token by user id
+func (r *Repository) GetSession(ctx context.Context, userId uint, refreshToken string) (*domain.Session, error) {
 	query := `
 		SELECT id, user_id, access_token, access_token_expires_at, refresh_token, refresh_token_expires_at, created_at, updated_at
 		FROM sessions
-		WHERE refresh_token = $1 AND user_id = $2
+		WHERE user_id = $1 AND refresh_token = $2
 	`
 
 	var sess domain.Session
-	if err := r.db.QueryRow(ctx, query, accessToken, userId).Scan(
+	if err := r.db.QueryRow(ctx, query, userId, refreshToken).Scan(
 		&sess.ID,
 		&sess.UserID,
 		&sess.AccessToken,

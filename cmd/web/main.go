@@ -4,20 +4,32 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/swaggo/http-swagger/v2"
 	"github.com/ziliscite/messaging-app/config"
+	"github.com/ziliscite/messaging-app/docs"
 	sessionRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/session"
 	userRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/user"
 	userHandler "github.com/ziliscite/messaging-app/internal/adapter/rest/user"
+	"github.com/ziliscite/messaging-app/internal/adapter/websocket"
 	authService "github.com/ziliscite/messaging-app/internal/core/service/auth"
 	userService "github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/db/posgres"
 	"github.com/ziliscite/messaging-app/pkg/must"
 	"github.com/ziliscite/messaging-app/pkg/ping"
-	_ "github.com/ziliscite/messaging-app/pkg/token"
+	"html/template"
 	"net/http"
 )
 
+// @title Messaging App
+// @version 1.0
+// @description This is a simple messaging app API.
+// @termsOfService http://swagger.io/terms/
+
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
 func main() {
 	configs := config.New()
 
@@ -26,12 +38,40 @@ func main() {
 
 	mux := chi.NewRouter()
 	mux.Use(middleware.Logger, middleware.Recoverer, middleware.URLFormat, middleware.CleanPath)
+	mux.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 
-	UserMux(mux, configs.Token, conn)
+	// separate webserver connection for websockets
+	socketMux := chi.NewRouter()
+	socket := websocket.NewSocket(socketMux)
+	go socket.Start(configs.WebsocketAddress())
 
 	ping.Register(mux)
+	UserMux(mux, configs.Token, conn)
 
-	fmt.Printf("Running on %s\n", configs.Address())
+	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		t, err := template.ParseFiles("template/index.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		err = t.Execute(w, nil)
+	})
+
+	docs.SwaggerInfo.Host = configs.Address()
+	docs.SwaggerInfo.BasePath = "/"
+	mux.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("doc.json"),
+	))
+
+	fmt.Printf("Webserver running on %s\n", configs.Address())
 	fmt.Printf("Routes:\n")
 	must.MustServe(chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		fmt.Printf("  %-7s %s\n", method, route)
@@ -51,3 +91,5 @@ func UserMux(mux *chi.Mux, cfg *config.TokenConfig, conn *pgxpool.Pool) {
 	handler := userHandler.New(userSvc, authSvc)
 	handler.Routes(mux)
 }
+
+// swag init -g cmd/web/main.go

@@ -1,0 +1,235 @@
+basePath: /
+definitions:
+  auth.RefreshResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+    type: object
+  internal_adapter_rest_user.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      refresh_token:
+        type: string
+      refresh_token_expires_at:
+        type: string
+      username:
+        type: string
+    type: object
+  res.BadRequestError:
+    properties:
+      error:
+        example: 'Invalid request: Please check your input'
+        type: string
+    type: object
+  res.ConflictError:
+    properties:
+      error:
+        example: 'Resource conflict: The request could not be completed due to a conflict'
+        type: string
+    type: object
+  res.InternalServerError:
+    properties:
+      error:
+        example: Internal server error occurred
+        type: string
+    type: object
+  res.NotFoundError:
+    properties:
+      error:
+        example: Resource not found
+        type: string
+    type: object
+  res.UnauthorizedError:
+    properties:
+      error:
+        example: 'Unauthorized: Authentication required'
+        type: string
+    type: object
+  user.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  user.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  user.RegisterResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: This is a simple messaging app API.
+  termsOfService: http://swagger.io/terms/
+  title: Messaging App
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return session tokens
+      parameters:
+      - description: User login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_adapter_rest_user.LoginResponse'
+        "400":
+          description: Bad Request - Invalid input data
+          schema:
+            $ref: '#/definitions/res.BadRequestError'
+        "401":
+          description: Unauthorized - Invalid credentials
+          schema:
+            $ref: '#/definitions/res.UnauthorizedError'
+        "404":
+          description: Not Found - User not found
+          schema:
+            $ref: '#/definitions/res.NotFoundError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/res.InternalServerError'
+      summary: Login user
+      tags:
+      - auth
+  /auth/logout:
+    delete:
+      consumes:
+      - application/json
+      description: Revoke the user's session
+      parameters:
+      - description: Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/res.UnauthorizedError'
+        "404":
+          description: Not Found - Session not found
+          schema:
+            $ref: '#/definitions/res.NotFoundError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/res.InternalServerError'
+      security:
+      - Bearer: []
+      summary: Logout user
+      tags:
+      - auth
+  /auth/refresh:
+    put:
+      consumes:
+      - application/json
+      description: Refresh the user's access token using a valid refresh token
+      parameters:
+      - description: Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.RefreshResponse'
+        "400":
+          description: Bad Request - Invalid input data
+          schema:
+            $ref: '#/definitions/res.BadRequestError'
+        "401":
+          description: Unauthorized - Invalid or expired refresh token
+          schema:
+            $ref: '#/definitions/res.UnauthorizedError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/res.InternalServerError'
+      security:
+      - Bearer: []
+      summary: Refresh access token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the provided details
+      parameters:
+      - description: User registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.RegisterResponse'
+        "400":
+          description: Bad Request - Invalid input data
+          schema:
+            $ref: '#/definitions/res.BadRequestError'
+        "409":
+          description: Conflict - User already exists
+          schema:
+            $ref: '#/definitions/res.ConflictError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/res.InternalServerError'
+      summary: Register a new user
+      tags:
+      - auth
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

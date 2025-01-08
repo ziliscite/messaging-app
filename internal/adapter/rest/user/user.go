@@ -21,9 +21,16 @@ func New(us user.API, as auth.API) *Handler {
 
 func (h *Handler) Routes(mux *chi.Mux) {
 	mux.With().Route("/auth", func(r chi.Router) {
+		//
 		r.Post("/register", h.Register)
+
+		//
 		r.Post("/login", h.Login)
+
+		//
 		r.With(middleware.AuthMiddleware).Delete("/logout", h.Logout)
+
+		//
 		r.With(middleware.RefreshMiddleware).Put("/refresh", h.Refresh)
 	})
 }

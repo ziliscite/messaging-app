@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -9,15 +10,20 @@ import (
 	"github.com/swaggo/http-swagger/v2"
 	"github.com/ziliscite/messaging-app/config"
 	"github.com/ziliscite/messaging-app/docs"
+	messageRepository "github.com/ziliscite/messaging-app/internal/adapter/mongo/message"
 	sessionRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/session"
 	userRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/user"
+	messageHandler "github.com/ziliscite/messaging-app/internal/adapter/rest/message"
 	userHandler "github.com/ziliscite/messaging-app/internal/adapter/rest/user"
 	"github.com/ziliscite/messaging-app/internal/adapter/websocket"
 	authService "github.com/ziliscite/messaging-app/internal/core/service/auth"
+	messageService "github.com/ziliscite/messaging-app/internal/core/service/message"
 	userService "github.com/ziliscite/messaging-app/internal/core/service/user"
+	nsql "github.com/ziliscite/messaging-app/pkg/db/mongo"
 	"github.com/ziliscite/messaging-app/pkg/db/posgres"
 	"github.com/ziliscite/messaging-app/pkg/must"
 	"github.com/ziliscite/messaging-app/pkg/ping"
+	"go.mongodb.org/mongo-driver/mongo"
 	"html/template"
 	"net/http"
 )
@@ -47,38 +53,29 @@ func main() {
 		MaxAge:           300,
 	}))
 
+	client := nsql.New(configs.Mongo)
+	defer client.Disconnect(context.Background())
+
 	// separate webserver connection for websockets
 	socketMux := chi.NewRouter()
-	socket := websocket.NewSocket(socketMux)
+	socketMux.Use(middleware.Logger, middleware.Recoverer)
+	socket := MessageMux(mux, socketMux, client)
 	go socket.Start(configs.WebsocketAddress())
 
 	ping.Register(mux)
 	UserMux(mux, configs.Token, conn)
+	Statics(mux, configs.Address())
+	Serve(mux, configs.Address())
+}
 
-	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		t, err := template.ParseFiles("template/index.html")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+func MessageMux(mux *chi.Mux, socketMux *chi.Mux, client *mongo.Client) *websocket.Socket {
+	messageRepo := messageRepository.New(client)
+	messageSvc := messageService.New(messageRepo)
 
-		err = t.Execute(w, nil)
-	})
+	handler := messageHandler.New(messageSvc)
+	handler.Routes(mux)
 
-	docs.SwaggerInfo.Host = configs.Address()
-	docs.SwaggerInfo.BasePath = "/"
-	mux.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("doc.json"),
-	))
-
-	fmt.Printf("Webserver running on %s\n", configs.Address())
-	fmt.Printf("Routes:\n")
-	must.MustServe(chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-		fmt.Printf("  %-7s %s\n", method, route)
-		return nil
-	}))
-
-	must.MustServe(http.ListenAndServe(configs.Address(), mux))
+	return websocket.NewSocket(socketMux, messageSvc)
 }
 
 func UserMux(mux *chi.Mux, cfg *config.TokenConfig, conn *pgxpool.Pool) {
@@ -90,6 +87,35 @@ func UserMux(mux *chi.Mux, cfg *config.TokenConfig, conn *pgxpool.Pool) {
 
 	handler := userHandler.New(userSvc, authSvc)
 	handler.Routes(mux)
+}
+
+func Statics(mux *chi.Mux, address string) {
+	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		t, err := template.ParseFiles("template/index.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		err = t.Execute(w, nil)
+	})
+
+	docs.SwaggerInfo.Host = address
+	docs.SwaggerInfo.BasePath = "/"
+	mux.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("doc.json"),
+	))
+}
+
+func Serve(mux *chi.Mux, address string) {
+	fmt.Printf("Webserver running on %s\n", address)
+	fmt.Printf("Routes:\n")
+	must.MustServe(chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		fmt.Printf("  %-7s %s\n", method, route)
+		return nil
+	}))
+
+	must.MustServe(http.ListenAndServe(address, mux))
 }
 
 // swag init -g cmd/web/main.go

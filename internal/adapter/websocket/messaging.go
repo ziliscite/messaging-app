@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
-	"github.com/ziliscite/messaging-app/internal/core/domain/message"
+	domain "github.com/ziliscite/messaging-app/internal/core/domain/message"
+	"github.com/ziliscite/messaging-app/internal/core/service/message"
 	"github.com/ziliscite/messaging-app/pkg/must"
+	"log"
 	"net/http"
+	"os"
 	"sync"
-	"time"
 )
 
 type Socket struct {
@@ -16,11 +18,12 @@ type Socket struct {
 	up        *websocket.Upgrader
 	clients   map[*websocket.Conn]bool
 	m         sync.Mutex
-	broadcast chan message.Message
-	// service
+	broadcast chan domain.Message
+	logger    *log.Logger
+	service   message.WriteAPI
 }
 
-func NewSocket(mux *chi.Mux) *Socket {
+func NewSocket(mux *chi.Mux, service message.WriteAPI) *Socket {
 	return &Socket{
 		mux: mux,
 		up: &websocket.Upgrader{
@@ -31,52 +34,10 @@ func NewSocket(mux *chi.Mux) *Socket {
 			WriteBufferSize: 1024,
 		},
 		clients:   make(map[*websocket.Conn]bool),
-		broadcast: make(chan message.Message),
 		m:         sync.Mutex{},
-	}
-}
-
-func (s *Socket) HandleConnections(w http.ResponseWriter, r *http.Request) {
-	conn, err := s.up.Upgrade(w, r, nil)
-	if err != nil {
-		return
-	}
-
-	s.add(conn)
-	defer func() {
-		err = conn.Close()
-		if err != nil {
-			return
-		}
-		s.remove(conn)
-	}()
-
-	for {
-		var msg message.Message
-		if err = conn.ReadJSON(&msg); err != nil {
-			break
-		}
-
-		msg.Date = time.Now()
-
-		// insert
-
-		s.broadcast <- msg
-	}
-}
-
-func (s *Socket) HandleMessages() {
-	for msg := range s.broadcast {
-		clientsCopy := s.get()
-		for client := range clientsCopy {
-			if err := client.WriteJSON(msg); err != nil {
-				err = client.Close()
-				if err != nil {
-					return
-				}
-				s.remove(client)
-			}
-		}
+		broadcast: make(chan domain.Message),
+		logger:    log.New(os.Stdout, "WebSocket: ", log.Ldate|log.Ltime|log.Lshortfile),
+		service:   service,
 	}
 }
 
@@ -103,7 +64,10 @@ func (s *Socket) get() map[*websocket.Conn]bool {
 }
 
 func (s *Socket) Start(address string) {
-	s.mux.Get("/message/v1/send", s.HandleConnections)
+	s.mux.With().Route("/message", func(r chi.Router) {
+		r.Get("/send", s.HandleConnections)
+	})
+
 	go s.HandleMessages()
 
 	fmt.Printf("Starting WebSocket server on %s\n", address)

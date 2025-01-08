@@ -50,6 +50,9 @@ type Config struct {
 	// Database connection string
 	Database *DatabaseConfig
 
+	// Mongo connection string
+	Mongo string
+
 	// Environment is development or production
 	Environment string
 
@@ -71,6 +74,7 @@ func New() *Config {
 
 	return &Config{
 		Database:      database,
+		Mongo:         must.MustEnv(os.Getenv("MONGO_URI")),
 		Port:          must.MustEnv(os.Getenv("PORT")),
 		WebsocketPort: must.MustEnv(os.Getenv("WEB_SOCKET_PORT")),
 		Environment:   must.MustEnv(os.Getenv("ENVIRONMENT")),

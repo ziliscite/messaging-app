@@ -249,7 +249,7 @@
 
     // Function to fetch message history
     function fetchMessageHistory() {
-      fetch('/message/v1/history', {
+      fetch('/message/history', {
         method: 'GET',
         headers: {
           'Authorization': `${sessionStorage.getItem('jwtToken')}` // Include JWT token for authorization
@@ -274,7 +274,7 @@
 
     // Function to set up WebSocket connection
     function setupWebSocket() {
-      socket = new WebSocket('ws://localhost:8080/message/v1/send'); // Replace with your WebSocket server URL
+      socket = new WebSocket('ws://localhost:4000/message/send'); // Replace with your WebSocket server URL
 
       socket.onopen = function(event) {
         console.log('Connected to WebSocket server.');
@@ -322,7 +322,7 @@
 
       if (message.trim() !== '') {
         const msgObject = {
-          from: sessionStorage.getItem('email'),
+          from: sessionStorage.getItem('username'),
           message: message
         };
 

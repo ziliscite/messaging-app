@@ -56,6 +56,9 @@ type Config struct {
 	// Port server is running on
 	Port string
 
+	// WebsocketPort server is running on
+	WebsocketPort string
+
 	// Token config for JWT
 	Token *TokenConfig
 }
@@ -67,10 +70,11 @@ func New() *Config {
 	token := newTokenConfig()
 
 	return &Config{
-		Database:    database,
-		Port:        must.MustEnv(os.Getenv("PORT")),
-		Environment: must.MustEnv(os.Getenv("ENVIRONMENT")),
-		Token:       token,
+		Database:      database,
+		Port:          must.MustEnv(os.Getenv("PORT")),
+		WebsocketPort: must.MustEnv(os.Getenv("WEB_SOCKET_PORT")),
+		Environment:   must.MustEnv(os.Getenv("ENVIRONMENT")),
+		Token:         token,
 	}
 }
 
@@ -80,6 +84,14 @@ func (c *Config) Address() string {
 	}
 
 	return "localhost" + c.Port
+}
+
+func (c *Config) WebsocketAddress() string {
+	if c.Environment == "production" {
+		return "0.0.0.0" + c.WebsocketPort
+	}
+
+	return "localhost" + c.WebsocketPort
 }
 
 func (c *Config) IsProduction() bool {

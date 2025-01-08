@@ -12,6 +12,7 @@ import (
 	sessionRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/session"
 	userRepository "github.com/ziliscite/messaging-app/internal/adapter/posgres/user"
 	userHandler "github.com/ziliscite/messaging-app/internal/adapter/rest/user"
+	"github.com/ziliscite/messaging-app/internal/adapter/websocket"
 	authService "github.com/ziliscite/messaging-app/internal/core/service/auth"
 	userService "github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/db/posgres"
@@ -46,6 +47,11 @@ func main() {
 		MaxAge:           300,
 	}))
 
+	// separate webserver connection for websockets
+	socketMux := chi.NewRouter()
+	socket := websocket.NewSocket(socketMux)
+	go socket.Start(configs.WebsocketAddress())
+
 	ping.Register(mux)
 	UserMux(mux, configs.Token, conn)
 
@@ -65,7 +71,7 @@ func main() {
 		httpSwagger.URL("doc.json"),
 	))
 
-	fmt.Printf("Running on %s\n", configs.Address())
+	fmt.Printf("Webserver running on %s\n", configs.Address())
 	fmt.Printf("Routes:\n")
 	must.MustServe(chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		fmt.Printf("  %-7s %s\n", method, route)

@@ -7,14 +7,10 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/ziliscite/messaging-app/internal/adapter/posgres"
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/session"
-	"go.elastic.co/apm"
 )
 
 // GetSession returns a refresh token by user id
 func (r *Repository) GetSession(ctx context.Context, userId uint, refreshToken string) (*domain.Session, error) {
-	span, spanCtx := apm.StartSpan(ctx, "get session", "repository")
-	defer span.End()
-
 	query := `
 		SELECT id, user_id, access_token, access_token_expires_at, refresh_token, refresh_token_expires_at, created_at, updated_at
 		FROM sessions
@@ -22,7 +18,7 @@ func (r *Repository) GetSession(ctx context.Context, userId uint, refreshToken s
 	`
 
 	var sess domain.Session
-	if err := r.db.QueryRow(spanCtx, query, userId, refreshToken).Scan(
+	if err := r.db.QueryRow(ctx, query, userId, refreshToken).Scan(
 		&sess.ID,
 		&sess.UserID,
 		&sess.AccessToken,

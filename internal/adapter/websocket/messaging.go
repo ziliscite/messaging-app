@@ -2,14 +2,14 @@ package websocket
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/message"
 	"github.com/ziliscite/messaging-app/internal/core/service/message"
 	"github.com/ziliscite/messaging-app/pkg/must"
+	"io"
 	"log"
 	"net/http"
-	"os"
 	"sync"
 )
 
@@ -23,7 +23,7 @@ type Socket struct {
 	service   message.WriteAPI
 }
 
-func NewSocket(mux *chi.Mux, service message.WriteAPI) *Socket {
+func NewSocket(mux *chi.Mux, wr io.Writer, service message.WriteAPI) *Socket {
 	return &Socket{
 		mux: mux,
 		up: &websocket.Upgrader{
@@ -36,7 +36,7 @@ func NewSocket(mux *chi.Mux, service message.WriteAPI) *Socket {
 		clients:   make(map[*websocket.Conn]bool),
 		m:         sync.Mutex{},
 		broadcast: make(chan domain.Message),
-		logger:    log.New(os.Stdout, "WebSocket: ", log.Ldate|log.Ltime|log.Lshortfile),
+		logger:    log.New(wr, "WebSocket: ", log.Ldate|log.Ltime),
 		service:   service,
 	}
 }

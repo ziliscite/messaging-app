@@ -1,0 +1,124 @@
+2025/01/09 23:48:56 "GET //health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0000ms
+2025/01/09 23:49:00 "GET //=health HTTP/1.1" from 127.0.0.1:57730 - 404 19B in 0.0000ms
+2025/01/09 23:49:03 "GET /health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0721ms
+2025/01/09 23:49:05 "GET /health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0000ms
+2025/01/09 23:49:05 "GET /health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0000ms
+2025/01/09 23:49:05 "GET /health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0000ms
+2025/01/09 23:49:21 "GET /health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0000ms
+2025/01/09 23:49:21 "GET /health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0000ms
+2025/01/09 23:49:22 "GET /health HTTP/1.1" from 127.0.0.1:57730 - 200 17B in 0.0000ms
+2025/01/09 23:50:50 "POST /auth/login HTTP/1.1" from 127.0.0.1:57823 - 200 691B in 134.4416ms
+2025/01/09 23:51:26 "GET /message/history HTTP/1.1" from 127.0.0.1:57823 - 500 40B in 30.0009312s
+2025/01/09 23:54:51 "GET /message/history HTTP/1.1" from 127.0.0.1:58157 - 500 40B in 30.0007768s
+2025/01/09 23:55:07 "GET /message/send HTTP/1.1" from 127.0.0.1:58200 - 0 0B in 39.034465s
+2025/01/09 23:57:52 "GET /message/history HTTP/1.1" from 127.0.0.1:58581 - 200 1638B in 431.3869ms
+2025/01/09 23:57:57 "GET /message/history HTTP/1.1" from 127.0.0.1:58581 - 200 1638B in 67.7479ms
+2025/01/09 23:58:05 "GET / HTTP/1.1" from 127.0.0.1:58590 - 200 11384B in 1.6064ms
+2025/01/09 23:58:06 "POST /auth/login HTTP/1.1" from 127.0.0.1:58590 - 200 688B in 316.5949ms
+2025/01/09 23:58:07 "GET /message/history HTTP/1.1" from 127.0.0.1:58590 - 403 19B in 0.0000ms
+2025/01/10 00:00:05 "GET /message/history HTTP/1.1" from 127.0.0.1:58694 - 200 1885B in 405.0571ms
+2025/01/10 00:00:19 "GET / HTTP/1.1" from 127.0.0.1:58710 - 200 11391B in 1.6334ms
+2025/01/10 00:00:19 "GET /message/history HTTP/1.1" from 127.0.0.1:58710 - 200 1885B in 67.3974ms
+2025/01/10 00:00:42 "GET /message/history HTTP/1.1" from 127.0.0.1:58694 - 200 2475B in 65.1758ms
+2025/01/10 00:01:00 "GET /message/history HTTP/1.1" from 127.0.0.1:58694 - 200 2475B in 69.3375ms
+2025/01/10 00:01:03 "GET /message/history HTTP/1.1" from 127.0.0.1:58694 - 200 2475B in 127.3748ms
+2025/01/10 00:08:03 "GET /message/history HTTP/1.1" from 127.0.0.1:59183 - 200 2475B in 487.8403ms
+2025/01/10 00:08:07 "GET /message/history HTTP/1.1" from 127.0.0.1:59183 - 200 2475B in 57.3766ms
+2025/01/10 00:08:10 "GET / HTTP/1.1" from 127.0.0.1:59192 - 200 11391B in 0.5148ms
+WebSocket: 2025/01/10 00:08:11 server.go:14: New connection from 127.0.0.1:59195
+2025/01/10 00:08:11 "GET /message/history HTTP/1.1" from 127.0.0.1:59192 - 200 2475B in 63.1380ms
+WebSocket: 2025/01/10 00:08:14 client.go:5: Broadcasting message: {surya nugraha 2025-01-10 00:08:14.7589043 +0700 +07 m=+185.202948301 coy}
+WebSocket: 2025/01/10 00:08:19 client.go:5: Broadcasting message: {surya nugraha 2025-01-10 00:08:19.33415 +0700 +07 m=+189.778194001 oy vey}
+2025/01/10 01:15:14 "GET /health HTTP/1.1" from 127.0.0.1:61813 - 200 17B in 4.4162ms
+2025/01/10 01:15:15 "GET /health HTTP/1.1" from 127.0.0.1:61813 - 200 17B in 0.0000ms
+2025/01/10 01:15:16 "GET /health HTTP/1.1" from 127.0.0.1:61813 - 200 17B in 0.0000ms
+2025/01/10 01:37:47 http: panic serving 127.0.0.1:63372: runtime error: invalid memory address or nil pointer dereference
+goroutine 174 [running]:
+net/http.(*conn).serve.func1()
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:1947 +0xbe
+panic({0x16936a0?, 0x2782c40?})
+	C:/Users/manzi/go/go1.23.4/src/runtime/panic.go:785 +0x132
+go.elastic.co/apm/module/apmchi.getRoutePattern(0xc000707400)
+	C:/Users/manzi/go/pkg/mod/go.elastic.co/apm/module/apmchi@v1.15.0/middleware.go:70 +0xa4
+go.elastic.co/apm/module/apmchi.routeRequestName(0xc000707400)
+	C:/Users/manzi/go/pkg/mod/go.elastic.co/apm/module/apmchi@v1.15.0/middleware.go:56 +0x18
+go.elastic.co/apm/module/apmhttp.(*handler).ServeHTTP(0xc00016a9c0, {0x2149f50, 0xc0001487e0}, 0xc000707400)
+	C:/Users/manzi/go/pkg/mod/go.elastic.co/apm/module/apmhttp@v1.15.0/handler.go:77 +0xde
+github.com/go-chi/chi/v5.(*Mux).ServeHTTP(0xc00008d620, {0x2149f50, 0xc0001487e0}, 0xc0007072c0)
+	C:/Users/manzi/go/pkg/mod/github.com/go-chi/chi/v5@v5.2.0/mux.go:90 +0x2ee
+net/http.serverHandler.ServeHTTP({0xc0002099b0?}, {0x2149f50?, 0xc0001487e0?}, 0x6?)
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:3210 +0x8e
+net/http.(*conn).serve(0xc0004b4f30, {0x214c230, 0xc000602150})
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:2092 +0x5d0
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:3360 +0x485
+2025/01/10 01:38:42 http: panic serving 127.0.0.1:63436: runtime error: invalid memory address or nil pointer dereference
+goroutine 138 [running]:
+net/http.(*conn).serve.func1()
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:1947 +0xbe
+panic({0x16936a0?, 0x2782c40?})
+	C:/Users/manzi/go/go1.23.4/src/runtime/panic.go:785 +0x132
+go.elastic.co/apm/module/apmchi.getRoutePattern(0xc000178780)
+	C:/Users/manzi/go/pkg/mod/go.elastic.co/apm/module/apmchi@v1.15.0/middleware.go:70 +0xa4
+go.elastic.co/apm/module/apmchi.routeRequestName(0xc000178780)
+	C:/Users/manzi/go/pkg/mod/go.elastic.co/apm/module/apmchi@v1.15.0/middleware.go:56 +0x18
+go.elastic.co/apm/module/apmhttp.(*handler).ServeHTTP(0xc0004d4580, {0x2149f50, 0xc00029e380}, 0xc000178780)
+	C:/Users/manzi/go/pkg/mod/go.elastic.co/apm/module/apmhttp@v1.15.0/handler.go:77 +0xde
+github.com/go-chi/chi/v5.(*Mux).ServeHTTP(0xc0005005a0, {0x2149f50, 0xc00029e380}, 0xc000178640)
+	C:/Users/manzi/go/pkg/mod/github.com/go-chi/chi/v5@v5.2.0/mux.go:90 +0x2ee
+net/http.serverHandler.ServeHTTP({0xc0007030b0?}, {0x2149f50?, 0xc00029e380?}, 0x6?)
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:3210 +0x8e
+net/http.(*conn).serve(0xc000180900, {0x214c230, 0xc000524360})
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:2092 +0x5d0
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Users/manzi/go/go1.23.4/src/net/http/server.go:3360 +0x485
+2025/01/10 01:40:58 "GET /health HTTP/1.1" from 127.0.0.1:63626 - 200 17B in 0.0000ms
+2025/01/10 01:41:00 "GET /health HTTP/1.1" from 127.0.0.1:63626 - 200 17B in 0.0000ms
+2025/01/10 01:41:01 "GET /health HTTP/1.1" from 127.0.0.1:63626 - 200 17B in 0.0000ms
+2025/01/10 01:41:02 "GET /health HTTP/1.1" from 127.0.0.1:63626 - 200 17B in 0.0000ms
+2025/01/10 01:41:02 "GET /health HTTP/1.1" from 127.0.0.1:63626 - 200 17B in 0.0000ms
+2025/01/10 01:41:03 "GET /health HTTP/1.1" from 127.0.0.1:63626 - 200 17B in 0.0000ms
+2025/01/10 01:45:46 "GET /health HTTP/1.1" from 127.0.0.1:63900 - 500 0B in 1.0997ms
+2025/01/10 01:49:22 "GET /health HTTP/1.1" from 127.0.0.1:64189 - 500 0B in 0.5181ms
+2025/01/10 01:51:57 "GET /health HTTP/1.1" from 127.0.0.1:64339 - 500 0B in 1.1068ms
+2025/01/10 01:52:08 "GET /health/ HTTP/1.1" from 127.0.0.1:64339 - 500 0B in 0.0000ms
+2025/01/10 01:52:12 "GET /health HTTP/1.1" from 127.0.0.1:64339 - 500 0B in 1.0091ms
+2025/01/10 01:52:13 "GET /health HTTP/1.1" from 127.0.0.1:64339 - 500 0B in 0.0000ms
+2025/01/10 01:56:08 "GET /health HTTP/1.1" from 127.0.0.1:64570 - 500 0B in 0.5211ms
+2025/01/10 02:00:56 "GET /health HTTP/1.1" from 127.0.0.1:65055 - 500 0B in 0.5171ms
+2025/01/10 02:01:11 "GET /health HTTP/1.1" from 127.0.0.1:65071 - 500 0B in 0.5327ms
+2025/01/10 02:06:27 "GET /health HTTP/1.1" from 127.0.0.1:65492 - 200 17B in 0.0000ms
+2025/01/10 02:18:44 "GET /health HTTP/1.1" from 127.0.0.1:50379 - 200 17B in 0.5073ms
+2025/01/10 02:19:06 "POST /auth/login HTTP/1.1" from 127.0.0.1:50379 - 200 691B in 161.3856ms
+2025/01/10 02:19:24 "PUT /auth/refresh HTTP/1.1" from 127.0.0.1:50379 - 200 317B in 4.5420ms
+2025/01/10 02:19:41 "DELETE /auth/logout HTTP/1.1" from 127.0.0.1:50379 - 204 0B in 1.1325ms
+2025/01/10 02:19:43 "DELETE /auth/logout HTTP/1.1" from 127.0.0.1:50379 - 404 41B in 0.0000ms
+2025/01/10 02:20:38 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.0739ms
+2025/01/10 02:20:46 "GET /health HTTP/1.1" from 127.0.0.1:50379 - 200 17B in 0.0000ms
+2025/01/10 02:20:47 "GET /health HTTP/1.1" from 127.0.0.1:50379 - 200 17B in 0.0000ms
+2025/01/10 02:20:49 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.0000ms
+2025/01/10 02:20:50 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.0000ms
+2025/01/10 02:20:56 "POST /auth/register HTTP/1.1" from 127.0.0.1:50379 - 409 27B in 92.7542ms
+2025/01/10 02:21:41 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.8429ms
+2025/01/10 02:22:05 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.8115ms
+2025/01/10 02:56:16 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 02:56:19 "GET /health HTTP/1.1" from 127.0.0.1:53156 - 200 17B in 0.5106ms
+2025/01/10 02:56:20 "GET /health HTTP/1.1" from 127.0.0.1:53156 - 200 17B in 0.5287ms
+2025/01/10 02:57:09 "POST /auth/login HTTP/1.1" from 127.0.0.1:53156 - 200 691B in 170.6603ms
+2025/01/10 02:57:16 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 02:57:35 "PUT /auth/refresh HTTP/1.1" from 127.0.0.1:53156 - 200 317B in 5.3838ms
+2025/01/10 02:57:45 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 02:57:46 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 03:03:57 message handler
+2025/01/10 03:04:12 "GET /message/history HTTP/1.1" from 127.0.0.1:53832 - 200 2628B in 389.3815ms
+2025/01/10 03:04:18 "GET /message/history HTTP/1.1" from 127.0.0.1:53832 - 200 2628B in 54.3593ms
+2025/01/10 03:04:20 "GET /health HTTP/1.1" from 127.0.0.1:53832 - 200 17B in 0.0000ms
+2025/01/10 03:04:23 "POST /auth/login HTTP/1.1" from 127.0.0.1:53832 - 200 691B in 132.0634ms
+2025/01/10 03:04:33 "GET / HTTP/1.1" from 127.0.0.1:53851 - 200 11391B in 2.5865ms
+2025/01/10 03:04:34 "POST /auth/login HTTP/1.1" from 127.0.0.1:53851 - 200 688B in 86.7149ms
+WebSocket: 2025/01/10 03:04:34 New connection from 127.0.0.1:53858
+2025/01/10 03:04:34 "GET /message/history HTTP/1.1" from 127.0.0.1:53851 - 200 2628B in 54.7855ms
+WebSocket: 2025/01/10 03:04:38 Broadcasting message: {surya nugraha 2025-01-10 03:04:38.2689949 +0700 +07 m=+63.346451501 halo}
+WebSocket: 2025/01/10 03:04:40 Broadcasting message: {surya nugraha 2025-01-10 03:04:40.531575 +0700 +07 m=+65.609031601 ya}
+WebSocket: 2025/01/10 03:04:47 Broadcasting message: {surya nugraha 2025-01-10 03:04:47.5294278 +0700 +07 m=+72.606884401 aoa cona}
+WebSocket: 2025/01/10 03:06:48 Broadcasting message: {surya nugraha 2025-01-10 03:06:48.4916636 +0700 +07 m=+193.569120201 komk ga ke log bmjir}

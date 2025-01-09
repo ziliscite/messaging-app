@@ -1,10 +1,13 @@
 package must
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 func Must[T any](value T, err error) T {
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	return value
@@ -16,7 +19,7 @@ func MustServe(err error) {
 
 func MustEnv(value string) string {
 	if value == "" {
-		panic(ErrEnvNotFound.Error())
+		log.Panic(ErrEnvNotFound.Error())
 	}
 
 	return value

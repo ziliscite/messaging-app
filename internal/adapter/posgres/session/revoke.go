@@ -4,10 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/ziliscite/messaging-app/internal/adapter/posgres"
+	"go.elastic.co/apm"
 )
 
 func (r *Repository) Revoke(ctx context.Context, userId uint) error {
-	tag, err := r.db.Exec(ctx, `DELETE FROM sessions WHERE user_id = $1`, userId)
+	span, spanCtx := apm.StartSpan(ctx, "revoke session", "repository")
+	defer span.End()
+
+	tag, err := r.db.Exec(spanCtx, `DELETE FROM sessions WHERE user_id = $1`, userId)
 	if err != nil {
 		return fmt.Errorf("%w: %v", posgres.ErrDatabase, err)
 	}

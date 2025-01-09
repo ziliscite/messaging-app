@@ -53,6 +53,9 @@ type Config struct {
 	// Mongo connection string
 	Mongo string
 
+	// Elastic elk connection string
+	Elastic string
+
 	// Environment is development or production
 	Environment string
 
@@ -75,6 +78,7 @@ func New() *Config {
 	return &Config{
 		Database:      database,
 		Mongo:         must.MustEnv(os.Getenv("MONGO_URI")),
+		Elastic:       must.MustEnv(os.Getenv("ELASTIC_APM_SERVER_URL")),
 		Port:          must.MustEnv(os.Getenv("PORT")),
 		WebsocketPort: must.MustEnv(os.Getenv("WEB_SOCKET_PORT")),
 		Environment:   must.MustEnv(os.Getenv("ENVIRONMENT")),

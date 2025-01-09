@@ -27,7 +27,7 @@ func (s *Service) Refresh(ctx context.Context, refreshRequest *RefreshRequest) (
 		return nil, err
 	}
 
-	accessToken, accessTokenExpiresAt, err := token.Create(spanCtx, session.UserID, s.tc.AccessTokenExpirationTime, refreshRequest.Email, s.tc.Secret)
+	accessToken, accessTokenExpiresAt, err := token.Create(session.UserID, s.tc.AccessTokenExpirationTime, refreshRequest.Email, s.tc.Secret)
 	if err != nil {
 		return nil, err
 	}

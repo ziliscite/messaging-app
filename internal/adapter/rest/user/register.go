@@ -7,6 +7,7 @@ import (
 	"github.com/ziliscite/messaging-app/internal/adapter/posgres"
 	"github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/res"
+	"go.elastic.co/apm"
 	"net/http"
 )
 
@@ -23,13 +24,16 @@ import (
 // @Failure 500 {object} res.InternalServerError "Internal Server Error"
 // @Router /auth/register [post]
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
+	span, ctx := apm.StartSpan(r.Context(), "register", "controller")
+	defer span.End()
+
 	var request user.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		res.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	response, err := h.userService.Register(r.Context(), &request)
+	response, err := h.userService.Register(ctx, &request)
 	if err != nil {
 		switch {
 		case errors.Is(err, posgres.ErrDatabase) || errors.Is(err, user.ErrFailedHash):

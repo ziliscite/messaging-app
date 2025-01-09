@@ -2,12 +2,16 @@ package ping
 
 import (
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
+	"github.com/ziliscite/messaging-app/pkg/res"
+	"go.elastic.co/apm"
 	"net/http"
 )
 
 func ping(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	// ctx dikirim ke turunan functionnya, macam service atau repository
+	span, _ := apm.StartSpan(r.Context(), "ping", "controller")
+	defer span.End()
 
 	type PingRequest struct {
 		Message string `json:"message"`
@@ -15,24 +19,22 @@ func ping(w http.ResponseWriter, r *http.Request) {
 
 	var request PingRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		res.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	if len(request.Message) > 200 {
-		http.Error(w, "message too long", http.StatusBadRequest)
+		res.Error(w, "message too long", http.StatusBadRequest)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(map[string]any{"response": "Pong: " + request.Message})
+	res.Success(w, map[string]any{"response": "Pong: " + request.Message}, http.StatusOK)
 }
 
 func health(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(map[string]any{"message": "OK"})
+	span, _ := apm.StartSpan(r.Context(), "health", "controller")
+	defer span.End()
+	res.Success(w, map[string]any{"message": "OK"}, http.StatusOK)
 }
 
 func Register(mux *chi.Mux) {

@@ -7,9 +7,13 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/ziliscite/messaging-app/internal/adapter/posgres"
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/user"
+	"go.elastic.co/apm"
 )
 
 func (r *Repository) Create(ctx context.Context, user *domain.User) (*domain.User, error) {
+	span, spanCtx := apm.StartSpan(ctx, "create", "repository")
+	defer span.End()
+
 	query := `
         INSERT INTO users (username, email, password)
         VALUES ($1, $2, $3)
@@ -17,7 +21,7 @@ func (r *Repository) Create(ctx context.Context, user *domain.User) (*domain.Use
     `
 
 	var createdUser domain.User
-	if err := r.db.QueryRow(ctx, query, user.Username, user.Email, user.Password).Scan(
+	if err := r.db.QueryRow(spanCtx, query, user.Username, user.Email, user.Password).Scan(
 		&createdUser.ID,
 		&createdUser.Username,
 		&createdUser.Email,

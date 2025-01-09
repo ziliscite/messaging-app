@@ -9,6 +9,7 @@ import (
 	"github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/res"
 	"github.com/ziliscite/messaging-app/pkg/token"
+	"go.elastic.co/apm"
 	"net/http"
 	"time"
 )
@@ -37,13 +38,16 @@ type LoginResponse struct {
 // @Failure 500 {object} res.InternalServerError "Internal Server Error"
 // @Router /auth/login [post]
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
+	span, ctx := apm.StartSpan(r.Context(), "login", "controller")
+	defer span.End()
+
 	var request user.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		res.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	userResponse, err := h.userService.Login(r.Context(), &request)
+	userResponse, err := h.userService.Login(ctx, &request)
 	if err != nil {
 		switch {
 		case errors.Is(err, posgres.ErrDatabase):
@@ -58,7 +62,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessionResponse, err := h.authService.CreateSession(r.Context(), &auth.SessionRequest{
+	sessionResponse, err := h.authService.CreateSession(ctx, &auth.SessionRequest{
 		UserID: userResponse.ID,
 		Email:  userResponse.Email,
 	})

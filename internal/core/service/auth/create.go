@@ -4,6 +4,7 @@ import (
 	"context"
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/session"
 	"github.com/ziliscite/messaging-app/pkg/token"
+	"go.elastic.co/apm"
 	"time"
 )
 
@@ -21,17 +22,20 @@ type SessionResponse struct {
 }
 
 func (s *Service) CreateSession(ctx context.Context, request *SessionRequest) (*SessionResponse, error) {
-	refreshToken, refreshTokenExpiresAt, err := token.Create(request.UserID, s.tc.RefreshTokenExpirationTime, request.Email, s.tc.Secret)
+	span, spanCtx := apm.StartSpan(ctx, "create session", "service")
+	defer span.End()
+
+	refreshToken, refreshTokenExpiresAt, err := token.Create(spanCtx, request.UserID, s.tc.RefreshTokenExpirationTime, request.Email, s.tc.Secret)
 	if err != nil {
 		return nil, err
 	}
 
-	accessToken, accessTokenExpiresAt, err := token.Create(request.UserID, s.tc.AccessTokenExpirationTime, request.Email, s.tc.Secret)
+	accessToken, accessTokenExpiresAt, err := token.Create(spanCtx, request.UserID, s.tc.AccessTokenExpirationTime, request.Email, s.tc.Secret)
 	if err != nil {
 		return nil, err
 	}
 
-	session, err := s.sessionRepo.Create(ctx,
+	session, err := s.sessionRepo.Create(spanCtx,
 		&domain.Session{
 			UserID:                request.UserID,
 			AccessToken:           accessToken,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/user"
+	"go.elastic.co/apm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,6 +23,9 @@ type RegisterResponse struct {
 var ErrFailedHash = errors.New("failed to hash password")
 
 func (s *Service) Register(ctx context.Context, request *RegisterRequest) (*RegisterResponse, error) {
+	span, spanCtx := apm.StartSpan(ctx, "register", "service")
+	defer span.End()
+
 	username, err := domain.ValidateUsername(request.Username)
 	if err != nil {
 		return nil, err
@@ -48,7 +52,7 @@ func (s *Service) Register(ctx context.Context, request *RegisterRequest) (*Regi
 		Password: string(hashed),
 	}
 
-	user, err = s.userRepo.Create(ctx, user)
+	user, err = s.userRepo.Create(spanCtx, user)
 	if err != nil {
 		return nil, err
 	}

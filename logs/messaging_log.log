@@ -88,3 +88,37 @@ created by net/http.(*Server).Serve in goroutine 1
 2025/01/10 02:00:56 "GET /health HTTP/1.1" from 127.0.0.1:65055 - 500 0B in 0.5171ms
 2025/01/10 02:01:11 "GET /health HTTP/1.1" from 127.0.0.1:65071 - 500 0B in 0.5327ms
 2025/01/10 02:06:27 "GET /health HTTP/1.1" from 127.0.0.1:65492 - 200 17B in 0.0000ms
+2025/01/10 02:18:44 "GET /health HTTP/1.1" from 127.0.0.1:50379 - 200 17B in 0.5073ms
+2025/01/10 02:19:06 "POST /auth/login HTTP/1.1" from 127.0.0.1:50379 - 200 691B in 161.3856ms
+2025/01/10 02:19:24 "PUT /auth/refresh HTTP/1.1" from 127.0.0.1:50379 - 200 317B in 4.5420ms
+2025/01/10 02:19:41 "DELETE /auth/logout HTTP/1.1" from 127.0.0.1:50379 - 204 0B in 1.1325ms
+2025/01/10 02:19:43 "DELETE /auth/logout HTTP/1.1" from 127.0.0.1:50379 - 404 41B in 0.0000ms
+2025/01/10 02:20:38 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.0739ms
+2025/01/10 02:20:46 "GET /health HTTP/1.1" from 127.0.0.1:50379 - 200 17B in 0.0000ms
+2025/01/10 02:20:47 "GET /health HTTP/1.1" from 127.0.0.1:50379 - 200 17B in 0.0000ms
+2025/01/10 02:20:49 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.0000ms
+2025/01/10 02:20:50 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.0000ms
+2025/01/10 02:20:56 "POST /auth/register HTTP/1.1" from 127.0.0.1:50379 - 409 27B in 92.7542ms
+2025/01/10 02:21:41 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.8429ms
+2025/01/10 02:22:05 "GET /message/history HTTP/1.1" from 127.0.0.1:50379 - 404 19B in 0.8115ms
+2025/01/10 02:56:16 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 02:56:19 "GET /health HTTP/1.1" from 127.0.0.1:53156 - 200 17B in 0.5106ms
+2025/01/10 02:56:20 "GET /health HTTP/1.1" from 127.0.0.1:53156 - 200 17B in 0.5287ms
+2025/01/10 02:57:09 "POST /auth/login HTTP/1.1" from 127.0.0.1:53156 - 200 691B in 170.6603ms
+2025/01/10 02:57:16 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 02:57:35 "PUT /auth/refresh HTTP/1.1" from 127.0.0.1:53156 - 200 317B in 5.3838ms
+2025/01/10 02:57:45 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 02:57:46 "GET /message/history HTTP/1.1" from 127.0.0.1:53156 - 404 19B in 0.0000ms
+2025/01/10 03:03:57 message handler
+2025/01/10 03:04:12 "GET /message/history HTTP/1.1" from 127.0.0.1:53832 - 200 2628B in 389.3815ms
+2025/01/10 03:04:18 "GET /message/history HTTP/1.1" from 127.0.0.1:53832 - 200 2628B in 54.3593ms
+2025/01/10 03:04:20 "GET /health HTTP/1.1" from 127.0.0.1:53832 - 200 17B in 0.0000ms
+2025/01/10 03:04:23 "POST /auth/login HTTP/1.1" from 127.0.0.1:53832 - 200 691B in 132.0634ms
+2025/01/10 03:04:33 "GET / HTTP/1.1" from 127.0.0.1:53851 - 200 11391B in 2.5865ms
+2025/01/10 03:04:34 "POST /auth/login HTTP/1.1" from 127.0.0.1:53851 - 200 688B in 86.7149ms
+WebSocket: 2025/01/10 03:04:34 New connection from 127.0.0.1:53858
+2025/01/10 03:04:34 "GET /message/history HTTP/1.1" from 127.0.0.1:53851 - 200 2628B in 54.7855ms
+WebSocket: 2025/01/10 03:04:38 Broadcasting message: {surya nugraha 2025-01-10 03:04:38.2689949 +0700 +07 m=+63.346451501 halo}
+WebSocket: 2025/01/10 03:04:40 Broadcasting message: {surya nugraha 2025-01-10 03:04:40.531575 +0700 +07 m=+65.609031601 ya}
+WebSocket: 2025/01/10 03:04:47 Broadcasting message: {surya nugraha 2025-01-10 03:04:47.5294278 +0700 +07 m=+72.606884401 aoa cona}
+WebSocket: 2025/01/10 03:06:48 Broadcasting message: {surya nugraha 2025-01-10 03:06:48.4916636 +0700 +07 m=+193.569120201 komk ga ke log bmjir}

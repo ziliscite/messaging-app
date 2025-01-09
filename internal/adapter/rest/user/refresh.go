@@ -8,6 +8,7 @@ import (
 	"github.com/ziliscite/messaging-app/internal/core/service/auth"
 	"github.com/ziliscite/messaging-app/pkg/middleware"
 	"github.com/ziliscite/messaging-app/pkg/res"
+	"go.elastic.co/apm"
 	"net/http"
 )
 
@@ -25,25 +26,28 @@ import (
 // @Failure 500 {object} res.InternalServerError "Internal Server Error"
 // @Router /auth/refresh [put]
 func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
-	userId, ok := r.Context().Value(middleware.UserIDKey).(uint)
+	span, ctx := apm.StartSpan(r.Context(), "refresh", "controller")
+	defer span.End()
+
+	userId, ok := ctx.Value(middleware.UserIDKey).(uint)
 	if !ok {
 		res.Error(w, fmt.Sprintf("Internal server error: %s", domain.ErrFailedParsingValue), http.StatusInternalServerError)
 		return
 	}
 
-	email, ok := r.Context().Value(middleware.UserEmailKey).(string)
+	email, ok := ctx.Value(middleware.UserEmailKey).(string)
 	if !ok {
 		res.Error(w, fmt.Sprintf("Internal server error: %s", domain.ErrFailedParsingValue), http.StatusInternalServerError)
 		return
 	}
 
-	refreshToken, ok := r.Context().Value(middleware.RefreshKey).(string)
+	refreshToken, ok := ctx.Value(middleware.RefreshKey).(string)
 	if !ok {
 		res.Error(w, fmt.Sprintf("Internal server error: %s", domain.ErrFailedParsingValue), http.StatusInternalServerError)
 		return
 	}
 
-	response, err := h.authService.Refresh(r.Context(), &auth.RefreshRequest{
+	response, err := h.authService.Refresh(ctx, &auth.RefreshRequest{
 		UserID:       userId,
 		Email:        email,
 		RefreshToken: refreshToken,

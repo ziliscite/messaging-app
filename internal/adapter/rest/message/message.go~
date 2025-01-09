@@ -4,7 +4,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/ziliscite/messaging-app/internal/core/service/message"
 	"github.com/ziliscite/messaging-app/pkg/middleware"
-	"log"
 )
 
 type Handler struct {
@@ -18,7 +17,6 @@ func New(service message.ReadAPI) *Handler {
 }
 
 func (h *Handler) Routes(mux *chi.Mux) {
-	log.Println("message handler")
 	mux.With().Route("/message", func(r chi.Router) {
 		r.With(middleware.AuthMiddleware).Get("/history", h.GetAll)
 	})

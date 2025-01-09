@@ -1,7 +1,9 @@
 package websocket
 
 import (
+	"context"
 	"github.com/ziliscite/messaging-app/internal/core/service/message"
+	"go.elastic.co/apm"
 	"net/http"
 )
 
@@ -28,7 +30,10 @@ func (s *Socket) HandleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		response, err := s.service.Send(r.Context(), &msg)
+		tx := apm.DefaultTracer.StartTransaction("send message", "websocket")
+		ctx := apm.ContextWithTransaction(context.Background(), tx)
+
+		response, err := s.service.Send(ctx, &msg)
 		if err != nil {
 			s.logger.Printf("Error sending message: %v", err)
 		}

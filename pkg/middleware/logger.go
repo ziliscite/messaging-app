@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.elastic.co/apm"
 	"log"
 	"net/http"
 	"time"
@@ -10,6 +11,9 @@ import (
 
 func CustomLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		span, spanCtx := apm.StartSpan(r.Context(), "logger middleware", "middleware")
+		defer span.End()
+
 		start := time.Now()
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
@@ -35,6 +39,6 @@ func CustomLogger(next http.Handler) http.Handler {
 			)
 		}()
 
-		next.ServeHTTP(ww, r)
+		next.ServeHTTP(ww, r.WithContext(spanCtx))
 	})
 }

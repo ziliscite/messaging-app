@@ -2,8 +2,12 @@ package auth
 
 import (
 	"context"
+	"go.elastic.co/apm"
 )
 
 func (s *Service) Revoke(ctx context.Context, userId uint) error {
-	return s.sessionRepo.Revoke(ctx, userId)
+	span, spanCtx := apm.StartSpan(ctx, "revoke session", "service")
+	defer span.End()
+
+	return s.sessionRepo.Revoke(spanCtx, userId)
 }

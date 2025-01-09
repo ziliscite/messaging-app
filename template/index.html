@@ -316,7 +316,7 @@
       fetch('/message/history', {
         method: 'GET',
         headers: {
-          'Authorization': `${sessionStorage.getItem('jwtToken')}` // Include JWT token for authorization
+          'Authorization': 'Bearer ' + sessionStorage.getItem('jwtToken') // Include JWT token for authorization
         }
       })
       .then(response => {

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 	"github.com/ziliscite/messaging-app/internal/core/service/auth"
 	"github.com/ziliscite/messaging-app/internal/core/service/user"
 	"github.com/ziliscite/messaging-app/pkg/middleware"

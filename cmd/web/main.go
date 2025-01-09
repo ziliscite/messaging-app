@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -19,12 +19,18 @@ import (
 	authService "github.com/ziliscite/messaging-app/internal/core/service/auth"
 	messageService "github.com/ziliscite/messaging-app/internal/core/service/message"
 	userService "github.com/ziliscite/messaging-app/internal/core/service/user"
+	logfile "github.com/ziliscite/messaging-app/logs"
 	nsql "github.com/ziliscite/messaging-app/pkg/db/mongo"
 	"github.com/ziliscite/messaging-app/pkg/db/posgres"
+	cm "github.com/ziliscite/messaging-app/pkg/middleware"
 	"github.com/ziliscite/messaging-app/pkg/must"
 	"github.com/ziliscite/messaging-app/pkg/ping"
+	"go.elastic.co/apm"
+	"go.elastic.co/apm/module/apmchi"
 	"go.mongodb.org/mongo-driver/mongo"
 	"html/template"
+	"io"
+	"log"
 	"net/http"
 )
 
@@ -37,13 +43,16 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	wr := logfile.Set()
+	log.SetOutput(wr)
+
 	configs := config.New()
 
 	conn := posgres.New(configs.Database)
 	defer conn.Close()
 
 	mux := chi.NewRouter()
-	mux.Use(middleware.Logger, middleware.Recoverer, middleware.URLFormat, middleware.CleanPath)
+	mux.Use(cm.CustomLogger, middleware.Recoverer)
 	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -58,24 +67,34 @@ func main() {
 
 	// separate webserver connection for websockets
 	socketMux := chi.NewRouter()
-	socketMux.Use(middleware.Logger, middleware.Recoverer)
-	socket := MessageMux(mux, socketMux, client)
-	go socket.Start(configs.WebsocketAddress())
+	socketMux.Use(cm.CustomLogger, middleware.Recoverer)
+
+	// apm middleware
+	tracer, err := apm.NewTracer("messaging-app", "1.0.0")
+	if err != nil {
+		log.Printf("Failed to initialize APM: %v", err)
+	} else {
+		mux.Use(apmchi.Middleware(apmchi.WithTracer(tracer)))
+		socketMux.Use(apmchi.Middleware(apmchi.WithTracer(tracer)))
+	}
 
 	ping.Register(mux)
 	UserMux(mux, configs.Token, conn)
 	Statics(mux, configs.Address())
 	Serve(mux, configs.Address())
+
+	socket := MessageMux(mux, wr, socketMux, client)
+	go socket.Start(configs.WebsocketAddress())
 }
 
-func MessageMux(mux *chi.Mux, socketMux *chi.Mux, client *mongo.Client) *websocket.Socket {
+func MessageMux(mux *chi.Mux, wr io.Writer, socketMux *chi.Mux, client *mongo.Client) *websocket.Socket {
 	messageRepo := messageRepository.New(client)
 	messageSvc := messageService.New(messageRepo)
 
 	handler := messageHandler.New(messageSvc)
 	handler.Routes(mux)
 
-	return websocket.NewSocket(socketMux, messageSvc)
+	return websocket.NewSocket(socketMux, wr, messageSvc)
 }
 
 func UserMux(mux *chi.Mux, cfg *config.TokenConfig, conn *pgxpool.Pool) {

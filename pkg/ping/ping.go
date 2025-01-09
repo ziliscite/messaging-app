@@ -2,7 +2,7 @@ package ping
 
 import (
 	"encoding/json"
-	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi"
 	"net/http"
 )
 

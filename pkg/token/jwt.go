@@ -1,10 +1,12 @@
 package token
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ziliscite/messaging-app/pkg/must"
+	"go.elastic.co/apm"
 	"os"
 	"strconv"
 	"time"
@@ -23,7 +25,10 @@ type CustomClaims struct {
 // Create token
 //
 // Returns token string, expiration, and error
-func Create(id uint, exp int64, email, secretKey string) (string, time.Time, error) {
+func Create(ctx context.Context, id uint, exp int64, email, secretKey string) (string, time.Time, error) {
+	span, _ := apm.StartSpan(ctx, "create token", "package")
+	defer span.End()
+
 	now := time.Now()
 	expAt := now.Add(time.Duration(exp) * time.Minute)
 
@@ -51,7 +56,10 @@ func Create(id uint, exp int64, email, secretKey string) (string, time.Time, err
 // Validate token
 //
 // Returns user id and email
-func Validate(tokenStr, secretKey string) (uint, string, error) {
+func Validate(ctx context.Context, tokenStr, secretKey string) (uint, string, error) {
+	span, _ := apm.StartSpan(ctx, "validate token", "package")
+	defer span.End()
+
 	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})

@@ -84,7 +84,7 @@ func main() {
 	ping.Register(mux)
 	UserMux(mux, configs.Token, conn)
 	Statics(mux, configs.Address())
-	
+
 	Serve(mux, configs.Address())
 }
 

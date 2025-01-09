@@ -7,9 +7,13 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/ziliscite/messaging-app/internal/adapter/posgres"
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/user"
+	"go.elastic.co/apm"
 )
 
 func (r *Repository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+	span, spanCtx := apm.StartSpan(ctx, "get by email", "repository")
+	defer span.End()
+
 	query := `
 		SELECT id, username, password, email, created_at, updated_at
 		FROM users
@@ -17,7 +21,7 @@ func (r *Repository) GetByEmail(ctx context.Context, email string) (*domain.User
 	`
 
 	var user domain.User
-	if err := r.db.QueryRow(ctx, query, email).Scan(
+	if err := r.db.QueryRow(spanCtx, query, email).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Password,

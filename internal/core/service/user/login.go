@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	domain "github.com/ziliscite/messaging-app/internal/core/domain/user"
+	"go.elastic.co/apm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,6 +22,9 @@ type LoginResponse struct {
 var ErrInvalidCredentials = errors.New("invalid credentials")
 
 func (s *Service) Login(ctx context.Context, request *LoginRequest) (*LoginResponse, error) {
+	span, spanCtx := apm.StartSpan(ctx, "login", "service")
+	defer span.End()
+
 	// These 2 should probably goes in the client
 	_, err := domain.ValidateEmail(request.Email)
 	if err != nil {
@@ -32,7 +36,7 @@ func (s *Service) Login(ctx context.Context, request *LoginRequest) (*LoginRespo
 		return nil, err
 	}
 
-	user, err := s.userRepo.GetByEmail(ctx, request.Email)
+	user, err := s.userRepo.GetByEmail(spanCtx, request.Email)
 	if err != nil {
 		return nil, err
 	}

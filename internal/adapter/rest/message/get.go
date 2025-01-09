@@ -2,11 +2,15 @@ package message
 
 import (
 	"github.com/ziliscite/messaging-app/pkg/res"
+	"go.elastic.co/apm"
 	"net/http"
 )
 
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
-	histories, err := h.service.GetAll(r.Context())
+	span, ctx := apm.StartSpan(r.Context(), "get history", "controller")
+	defer span.End()
+
+	histories, err := h.service.GetAll(ctx)
 	if err != nil {
 		res.Error(w, err.Error(), http.StatusInternalServerError)
 		return

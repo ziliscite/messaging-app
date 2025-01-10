@@ -60,4 +60,4 @@ jobs:
           echo "WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }}"
 
       - name: Run Docker container
-        run: docker run -d --name messaging -p ${{ secrets.PORT }}:${{ secrets.PORT }} -p ${{ secrets.WEB_SOCKET_PORT }}:${{ secrets.WEB_SOCKET_PORT }} ${{ secrets.DOCKER_USERNAME }}/messaging:latest
+        run: docker run -d --name messaging -p ${{ secrets.PORT }}${{ secrets.PORT }} -p ${{ secrets.WEB_SOCKET_PORT }}${{ secrets.WEB_SOCKET_PORT }} ${{ secrets.DOCKER_USERNAME }}/messaging:latest

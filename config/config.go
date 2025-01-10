@@ -89,18 +89,18 @@ func New() *Config {
 
 func (c *Config) Address() string {
 	if c.Environment == "production" {
-		return "0.0.0.0" + c.Port
+		return "0.0.0.0:" + c.Port
 	}
 
-	return "localhost" + c.Port
+	return "localhost:" + c.Port
 }
 
 func (c *Config) WebsocketAddress() string {
 	if c.Environment == "production" {
-		return "0.0.0.0" + c.WebsocketPort
+		return "0.0.0.0:" + c.WebsocketPort
 	}
 
-	return "localhost" + c.WebsocketPort
+	return "localhost:" + c.WebsocketPort
 }
 
 func (c *Config) IsProduction() bool {

@@ -26,7 +26,9 @@ func newDatabaseConfig() *DatabaseConfig {
 }
 
 func (c *DatabaseConfig) ConnectionString() string {
-	return "host=" + c.DBHost + " port=" + c.DBPort + " user=" + c.DBUser + " password=" + c.DBPass + " dbname=" + c.DBName + " sslmode=disable"
+	// it was sslmode=disable
+	// but for RDS it to work after dockering, it should be sslmode=require
+	return "host=" + c.DBHost + " port=" + c.DBPort + " user=" + c.DBUser + " password=" + c.DBPass + " dbname=" + c.DBName + " sslmode=require"
 }
 
 type TokenConfig struct {

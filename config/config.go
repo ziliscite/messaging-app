@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
 	"github.com/ziliscite/messaging-app/pkg/must"
 	"os"
 	"strconv"
@@ -72,7 +71,7 @@ type Config struct {
 }
 
 func New() *Config {
-	must.MustServe(godotenv.Load())
+	//must.MustServe(godotenv.Load())
 
 	database := newDatabaseConfig()
 	token := newTokenConfig()

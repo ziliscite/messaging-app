@@ -11,29 +11,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4 # Checkout the repository
-
-      - name: Create .env file
-        run: |
-          touch .env
-          echo "PORT=${{ secrets.PORT }}" >> .env
-          echo "WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }}" >> .env
-          
-          echo "ENVIRONMENT=${{ secrets.ENVIRONMENT }}" >> .env
-          
-          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
-          
-          echo "ELASTIC_APM_SERVER_URL=${{ secrets.ELASTIC_APM_SERVER_URL }}" >> .env
-          
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
-          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-          echo "DB_PASS=${{ secrets.DB_PASS }}" >> .env
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
-
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          
-          echo "ACCESS_TOKEN_EXPIRATION_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRATION_MINUTES }}" >> .env
-          echo "REFRESH_TOKEN_EXPIRATION_HOURS=${{ secrets.REFRESH_TOKEN_EXPIRATION_HOURS }}" >> .env
           
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
@@ -54,10 +31,21 @@ jobs:
       - name: Delete old containers
         run: docker rm -f messaging
 
-      - name: Debug secrets
-        run: |
-          echo "PORT=${{ secrets.PORT }}"
-          echo "WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }}"
-
       - name: Run Docker container
-        run: docker run -d --name messaging -p ${{ secrets.PORT }}${{ secrets.PORT }} -p ${{ secrets.WEB_SOCKET_PORT }}${{ secrets.WEB_SOCKET_PORT }} ${{ secrets.DOCKER_USERNAME }}/messaging:latest
+        run: docker run -d --name messaging \
+          -p ${{ secrets.PORT }}${{ secrets.PORT }} \
+          -p ${{ secrets.WEB_SOCKET_PORT }}${{ secrets.WEB_SOCKET_PORT }} \
+          -e PORT=${{ secrets.PORT }} \
+          -e WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }} \
+          -e ENVIRONMENT=${{ secrets.ENVIRONMENT }} \
+          -e MONGO_URI=${{ secrets.MONGO_URI }} \
+          -e ELASTIC_APM_SERVER_URL=${{ secrets.ELASTIC_APM_SERVER_URL }} \
+          -e DB_HOST=${{ secrets.DB_HOST }} \
+          -e DB_PORT=${{ secrets.DB_PORT }} \
+          -e DB_USER=${{ secrets.DB_USER }} \
+          -e DB_PASS=${{ secrets.DB_PASS }} \
+          -e DB_NAME=${{ secrets.DB_NAME }} \
+          -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+          -e ACCESS_TOKEN_EXPIRATION_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRATION_MINUTES }} \
+          -e REFRESH_TOKEN_EXPIRATION_HOURS=${{ secrets.REFRESH_TOKEN_EXPIRATION_HOURS }} \
+          ${{ secrets.DOCKER_USERNAME }}/messaging:latest

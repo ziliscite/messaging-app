@@ -17,7 +17,7 @@ func (r *Repository) GetAll(ctx context.Context) (*[]domain.Message, error) {
 
 	cursor, err := r.col.Find(spanCtx, bson.D{})
 	if err != nil {
-		return nil, fmt.Errorf("%w: message", mongo.ErrNotFound)
+		return nil, fmt.Errorf("%w: %v", mongo.ErrNotFound, err)
 	}
 
 	for cursor.Next(spanCtx) {

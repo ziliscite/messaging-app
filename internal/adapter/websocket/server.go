@@ -38,6 +38,8 @@ func (s *Socket) HandleConnections(w http.ResponseWriter, r *http.Request) {
 			s.logger.Printf("Error sending message: %v", err)
 		}
 
+		tx.End()
+
 		s.broadcast <- *response
 	}
 }

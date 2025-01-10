@@ -4,3 +4,5 @@ out
 gen
 .env
 note.txt
+mydatabase.sql
+ca.pem

@@ -47,7 +47,7 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run \
+          docker run -d \
             -p "${{ secrets.PORT }}:${{ secrets.PORT }}" \
             -p "${{ secrets.WEB_SOCKET_PORT }}:${{ secrets.WEB_SOCKET_PORT }}" \
             -e PORT="${{ secrets.PORT }}" \

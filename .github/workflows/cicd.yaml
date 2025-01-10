@@ -46,4 +46,23 @@ jobs:
           # Do NOT echo sensitive information like DB_PASS and JWT_SECRET
 
       - name: Run Docker container
-        run: docker run -p ${{ secrets.PORT }}:${{ secrets.PORT }} -p ${{ secrets.WEB_SOCKET_PORT }}:${{ secrets.WEB_SOCKET_PORT }} -e PORT=${{ secrets.PORT }} -e WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }} -e ENVIRONMENT=${{ secrets.ENVIRONMENT }} -e MONGO_URI=${{ secrets.MONGO_URI }} -e ELASTIC_APM_SERVER_URL=${{ secrets.ELASTIC_APM_SERVER_URL }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_PORT=${{ secrets.DB_PORT }} -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_NAME=${{ secrets.DB_NAME }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e ACCESS_TOKEN_EXPIRATION_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRATION_MINUTES }} -e REFRESH_TOKEN_EXPIRATION_MINUTES=${{ secrets.REFRESH_TOKEN_EXPIRATION_MINUTES }} -e APP_NAME=${{ secrets.APP_NAME }} --name messaging ${{ secrets.DOCKER_USERNAME }}/messaging:latest
+        run: |
+          docker run \
+            -p "${{ secrets.PORT }}:${{ secrets.PORT }}" \
+            -p "${{ secrets.WEB_SOCKET_PORT }}:${{ secrets.WEB_SOCKET_PORT }}" \
+            -e PORT="${{ secrets.PORT }}" \
+            -e WEB_SOCKET_PORT="${{ secrets.WEB_SOCKET_PORT }}" \
+            -e ENVIRONMENT="${{ secrets.ENVIRONMENT }}" \
+            -e MONGO_URI="${{ secrets.MONGO_URI }}" \
+            -e ELASTIC_APM_SERVER_URL="${{ secrets.ELASTIC_APM_SERVER_URL }}" \
+            -e DB_HOST="${{ secrets.DB_HOST }}" \
+            -e DB_PORT="${{ secrets.DB_PORT }}" \
+            -e DB_USER="${{ secrets.DB_USER }}" \
+            -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -e DB_NAME="${{ secrets.DB_NAME }}" \
+            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            -e ACCESS_TOKEN_EXPIRATION_MINUTES="${{ secrets.ACCESS_TOKEN_EXPIRATION_MINUTES }}" \
+            -e REFRESH_TOKEN_EXPIRATION_MINUTES="${{ secrets.REFRESH_TOKEN_EXPIRATION_MINUTES }}" \
+            -e APP_NAME="${{ secrets.APP_NAME }}" \
+            --name messaging \
+            "${{ secrets.DOCKER_USERNAME }}/messaging:latest"

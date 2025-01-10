@@ -50,7 +50,14 @@ jobs:
     steps:
       - name: Pull Docker image
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/messaging:latest
+
       - name: Delete old containers
         run: docker rm -f messaging
+
+      - name: Debug secrets
+        run: |
+          echo "PORT=${{ secrets.PORT }}"
+          echo "WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }}"
+
       - name: Run Docker container
-        run: docker run -d --name messaging -p ${{ secrets.PORT }}:${{ secrets.PORT }} -p ${{ secrets.WEB_SOCKET_PORT }}:${{ secrets.WEB_SOCKET_PORT }} ${{ secrets.DOCKER_USERNAME }}/messaging:latest
+        run: docker run -d --name messaging -p ${{ secrets.PORT }}${{ secrets.PORT }} -p ${{ secrets.WEB_SOCKET_PORT }}${{ secrets.WEB_SOCKET_PORT }} ${{ secrets.DOCKER_USERNAME }}/messaging:latest

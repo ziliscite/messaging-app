@@ -32,20 +32,21 @@ jobs:
         run: docker rm -f messaging
 
       - name: Run Docker container
-        run: docker run -d --name messaging \
-          -p ${{ secrets.PORT }}${{ secrets.PORT }} \
-          -p ${{ secrets.WEB_SOCKET_PORT }}${{ secrets.WEB_SOCKET_PORT }} \
-          -e PORT=${{ secrets.PORT }} \
-          -e WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }} \
-          -e ENVIRONMENT=${{ secrets.ENVIRONMENT }} \
-          -e MONGO_URI=${{ secrets.MONGO_URI }} \
-          -e ELASTIC_APM_SERVER_URL=${{ secrets.ELASTIC_APM_SERVER_URL }} \
-          -e DB_HOST=${{ secrets.DB_HOST }} \
-          -e DB_PORT=${{ secrets.DB_PORT }} \
-          -e DB_USER=${{ secrets.DB_USER }} \
-          -e DB_PASS=${{ secrets.DB_PASS }} \
-          -e DB_NAME=${{ secrets.DB_NAME }} \
-          -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-          -e ACCESS_TOKEN_EXPIRATION_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRATION_MINUTES }} \
-          -e REFRESH_TOKEN_EXPIRATION_HOURS=${{ secrets.REFRESH_TOKEN_EXPIRATION_HOURS }} \
-          ${{ secrets.DOCKER_USERNAME }}/messaging:latest
+        run: |
+          docker run -d --name messaging \
+            -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
+            -p ${{ secrets.WEB_SOCKET_PORT }}:${{ secrets.WEB_SOCKET_PORT }} \
+            -e PORT=${{ secrets.PORT }} \
+            -e WEB_SOCKET_PORT=${{ secrets.WEB_SOCKET_PORT }} \
+            -e ENVIRONMENT=${{ secrets.ENVIRONMENT }} \
+            -e MONGO_URI=${{ secrets.MONGO_URI }} \
+            -e ELASTIC_APM_SERVER_URL=${{ secrets.ELASTIC_APM_SERVER_URL }} \
+            -e DB_HOST=${{ secrets.DB_HOST }} \
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_USER=${{ secrets.DB_USER }} \
+            -e DB_PASS=${{ secrets.DB_PASS }} \
+            -e DB_NAME=${{ secrets.DB_NAME }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e ACCESS_TOKEN_EXPIRATION_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRATION_MINUTES }} \
+            -e REFRESH_TOKEN_EXPIRATION_HOURS=${{ secrets.REFRESH_TOKEN_EXPIRATION_HOURS }} \
+            ${{ secrets.DOCKER_USERNAME }}/messaging:latest

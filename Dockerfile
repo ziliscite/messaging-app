@@ -25,7 +25,6 @@ WORKDIR /app
 
 # Copy the compiled binary from the builder image
 COPY --from=builder /app/messaging-app /app/messaging-app
-COPY --from=builder /app/.env /app/.env
 COPY --from=builder /app/ca.pem /app/ca.pem
 COPY --from=builder /app/template /app/template
 
